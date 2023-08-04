@@ -1,81 +1,24 @@
-const mysql = require("mysql2");
-const inquirer = require("inquirer");
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+// const api = require("./routes/apiRoutes");
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "password",
-  database: "employees_db",
-});
+const PORT = process.env.PORT || 3001;
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// app.use("/api", api);
 
-function init() {
-  inquirer
-    .prompt({
-      name: "initialQuestion",
-      type: "list",
-      message: "What do you want to do?",
-      choices: [
-        "view all departments",
-        "view all roles",
-        "view all employees",
-        "add a department",
-        "add a role",
-        "add an employee",
-        "update an employee role",
-        "EXIT",
-      ],
+app.use(express.static("public"));
+app.get('/api/notes', (req, res) => {
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if (error){
+            console.log(error)
+        }
+        res.json(JSON.parse(data))
     })
-    .then((answers) => {
-      switch (answers.initialQuestion) {
-        case "view all departments":
-          viewAllDepartments();
-          break;
-        case "view all roles":
-          viewAllRoles();
-          break;
-        case "view all employees":
-          viewAllEmployees();
-          break;
-        case "add a department":
-          addDepartment();
-          break;
-        case "add a role":
-          addRole();
-          break;
-        case "add an employee":
-          addEmployee();
-          break;
-        case "update an employee role":
-          updateEmployeeRole();
-          break;
-        case "EXIT":
-          db.end();
-          break;
-        default:
-          break;
-      }
-    });
-}
+})
 
-function viewAllDepartments() {
-}
-
-function viewAllRoles() {
-}
-
-function viewAllEmployees() {
-}
-
-function addDepartment() {
-}
-
-function addRole() {
-}
-
-function addEmployee() {
-}
-
-function updateEmployeeRole() {
-}
-
-init();
+app.get('/notes', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/notes.html'))
+);
